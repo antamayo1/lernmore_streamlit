@@ -472,13 +472,23 @@ def check_password():
       st.error("Incorrect username or password")
       st.session_state["authenticated"] = False
       
-  col1, col2, col3 = st.columns([2, 1, 2])
+  col1, col2, col3 = st.columns(3)
   with col2:
       if "authenticated" not in st.session_state or st.session_state["authenticated"] is False:
         container = st.container(border=True)
         with container:
-          st.image("LMC_Logo.jpeg", use_container_width=True)
-          st.markdown('<p style="text-align:center; font-size: 3em; font-weight: bold;">WELCOME!</p>', unsafe_allow_html=True)
+          # Center the image using CSS
+          st.markdown(
+            """
+            <div style="display: flex; justify-content: center; margin-bottom: 20px;">
+              <img src="data:image/jpeg;base64,{}" width="200" style="border-radius: 8px;">
+            </div>
+            """.format(
+              __import__('base64').b64encode(open("LMC_Logo.jpeg", "rb").read()).decode()
+            ),
+            unsafe_allow_html=True
+          )
+          st.markdown('<p style="text-align:center; font-size: 1.25em; font-weight: bold;">AI Profit Assessment Tool</p>', unsafe_allow_html=True)
           st.markdown('<p style="text-align:center;">Please log in to continue</p>', unsafe_allow_html=True)
           st.session_state["username"] = st.text_input("Username", key="username_input")
           st.session_state["password"] = st.text_input("Password", type="password", key="password_input")
