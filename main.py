@@ -4,8 +4,9 @@ import AMZ
 import ORL
 import AZ
 import PA
-from openai import OpenAI
+import VAST
 import UNITED
+from openai import OpenAI
 from io import BytesIO
 
 AI_client = OpenAI(
@@ -65,9 +66,9 @@ def to_excel_bytes(summary_df, defaults_df=None):
   return output.getvalue()
 
 st.set_page_config(
-    page_title="Rapid BCA Analyzer",
-    page_icon="logo-spectra-premium.jpg", 
-    layout="wide"
+  page_title="Rapid BCA Analyzer",
+  page_icon="LMC_Logo.jpeg",
+  layout="wide"
 )
 
 st.markdown("""
@@ -497,10 +498,12 @@ def getFileType(file_name):
     return "OReilly"
   elif file_name.startswith('AZ'):
     return "AZ"
+  elif file_name.startswith('VAST'):
+    return "VAST"
   elif file_name.startswith('UNITED'):
     return "United"
   else:
-    raise ValueError("File name must start with 'AMZ', 'PA', 'AZ', 'UNITED', or 'ORL' to determine the correct processing method.")
+    raise ValueError("File name must start with 'AMZ', 'PA', 'AZ', 'UNITED', 'VAST', or 'ORL' to determine the correct processing method.")
 
 if check_password():
   if 'input_file' not in st.session_state:
@@ -549,6 +552,8 @@ if check_password():
       return AZ.getSummary(uploaded_file, user_defaults_df)
     elif filename.startswith('UNITED'):
       return UNITED.getSummary(uploaded_file, user_defaults_df)
+    elif filename.startswith('VAST'):
+      return VAST.getSummary(uploaded_file, user_defaults_df)
     else:
       raise ValueError("File name must start with 'AMZ', 'PA', or 'ORL' to determine the correct processing method.")
 
@@ -581,40 +586,56 @@ if check_password():
               st.session_state.user_summary_df = None
           except Exception as e:
             st.error(f"❌ An error occurred: {str(e)}")
-
-        if st.session_state.input_defaults_df is not None or st.session_state.input_assumptions_df is not None:
-          column1, column2 = st.columns(2)
-          with column1:
-            st.markdown("#### Assumptions")
-            with st.expander("See Assumptions", expanded=True):
-              if st.session_state.input_assumptions_df is None:
-                st.write("No assumptions found in the original file.")
-              else:
-                for x in st.session_state.input_assumptions_df:
-                  subcol1, subcol2 = st.columns(2)
-                  with subcol1:
-                    st.write(f"**{x}**:", st.session_state.input_assumptions_df[x])
-                  with subcol2:
-                    st.session_state.user_assumptions_df[x] = st.number_input(label=f"assumptions", value=st.session_state.input_assumptions_df[x], key=f"assumption_{x}", label_visibility="collapsed", format="%.4f")
-          with column2:
-            st.markdown("#### Defaults")
-            with st.expander("See Defaults", expanded=True):
-              if st.session_state.input_defaults_df is None:
-                st.write("No defaults found in the original file.")
-              else:
-                for x in st.session_state.input_defaults_df:
-                  subcol1, subcol2 = st.columns(2)
-                  with subcol1:
-                    st.write(f"**{x}**:", st.session_state.input_defaults_df[x])
-                  with subcol2:
-                    st.session_state.user_defaults_df[x] = st.number_input(label=f"defaults", value=st.session_state.input_defaults_df[x], key=f"defaults_{x}", label_visibility="collapsed", format="%.4f")  
-          apply_changes = st.button("Calculate with Modified Values", key="apply_changes_button", use_container_width=True)
-          if apply_changes:
-              st.toast("Calculating with modified values... This may take a moment.")
-              output, assumption_test, defaults_test = process_file(input_file, (st.session_state.user_defaults_df or {}) | (st.session_state.user_assumptions_df or {}))
-              st.toast("Calculation complete!")
-              st.session_state.user_summary_df = output
-              st.session_state.response = "Analysis in progress..."
+        if file_type == "VAST":
+          col1, col2 = st.columns(2)
+          with col1:
+            st.markdown("#### Current Values")
+            with st.expander("See Current", expanded=True):
+              for x in st.session_state.input_assumptions_df.get('Current'):
+                st.write(f"**{x}**:", st.session_state.input_assumptions_df.get('Current')[x])
+          with col2:
+            st.markdown("#### New Values")
+            with st.expander("See New", expanded=True):
+              for x in st.session_state.input_assumptions_df.get('New'):
+                st.write(f"**{x}**:", st.session_state.input_assumptions_df.get('New')[x])
+          st.markdown("#### Assumptions")
+          with st.expander("See Assumptions", expanded=True):
+            for x in st.session_state.input_defaults_df:
+              st.write(f"**{x}**:", st.session_state.input_defaults_df[x])
+        else:
+          if st.session_state.input_defaults_df is not None or st.session_state.input_assumptions_df is not None:
+            column1, column2 = st.columns(2)
+            with column1:
+              st.markdown("#### Assumptions")
+              with st.expander("See Assumptions", expanded=True):
+                if st.session_state.input_assumptions_df is None:
+                  st.write("No assumptions found in the original file.")
+                else:
+                  for x in st.session_state.input_assumptions_df:
+                    subcol1, subcol2 = st.columns(2)
+                    with subcol1:
+                      st.write(f"{x}:", st.session_state.input_assumptions_df[x])
+                    with subcol2:
+                      st.session_state.user_assumptions_df[x] = st.number_input(label=f"assumptions", value=st.session_state.input_assumptions_df[x], key=f"assumption_{x}", label_visibility="collapsed", format="%.4f")
+            with column2:
+              st.markdown("#### Defaults")
+              with st.expander("See Defaults", expanded=True):
+                if st.session_state.input_defaults_df is None:
+                  st.write("No defaults found in the original file.")
+                else:
+                  for x in st.session_state.input_defaults_df:
+                    subcol1, subcol2 = st.columns(2)
+                    with subcol1:
+                      st.write(f"{x}:", st.session_state.input_defaults_df[x])
+                    with subcol2:
+                      st.session_state.user_defaults_df[x] = st.number_input(label=f"defaults", value=st.session_state.input_defaults_df[x], key=f"defaults_{x}", label_visibility="collapsed", format="%.4f")  
+            apply_changes = st.button("Calculate with Modified Values", key="apply_changes_button", use_container_width=True)
+            if apply_changes:
+                st.toast("Calculating with modified values... This may take a moment.")
+                output, assumption_test, defaults_test = process_file(input_file, (st.session_state.user_defaults_df or {}) | (st.session_state.user_assumptions_df or {}))
+                st.toast("Calculation complete!")
+                st.session_state.user_summary_df = output
+                st.session_state.response = "Analysis in progress..."
 
         if st.session_state.input_summary_df is not None:
           with st.expander("📊 View Complete Summary", expanded=False):
