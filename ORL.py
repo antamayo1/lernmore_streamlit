@@ -1,7 +1,7 @@
 import pandas as pd
 import utility_library as util
 
-def getSummary(file, user_defaults_df=None):
+def getSummary(file, user_defaults_df=None, volume=0.0):
 
   def getQTYDefect(column):
     return output.loc[output['Metric'] == 'QTY Gross', column].iloc[0] * DEFECT_PERCENT
@@ -203,8 +203,9 @@ def getSummary(file, user_defaults_df=None):
   output['Metric'] = METRICS
 
   print('Calculation QTY Gross...')
-  output.loc[output['Metric'] == 'QTY Gross', 'GTN/CGT Current Cumulative'] = util.getSumGivenColumn('All', DATA, 'L12 Actual')
-  output.loc[output['Metric'] == 'QTY Gross', 'GTN/CGT Blended Cumulative'] = util.getSumGivenColumn('All', DATA, 'L12 Actual')
+  gross_current = util.getSumGivenColumn('All', DATA, 'L12 Actual')
+  output.loc[output['Metric'] == 'QTY Gross', 'GTN/CGT Current Cumulative'] = gross_current + (gross_current * volume/100)
+  output.loc[output['Metric'] == 'QTY Gross', 'GTN/CGT Blended Cumulative'] = gross_current + (gross_current * volume/100)
 
   print('Calculating Defect %...')
   output.loc[output['Metric'] == 'Defect %', 'GTN/CGT Current Cumulative'] = DEFECT_PERCENT

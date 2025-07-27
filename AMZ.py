@@ -1,7 +1,7 @@
 import pandas as pd
 import utility_library as util
 
-def getSummary(file, user_defaults_df=None):
+def getSummary(file, user_defaults_df=None, volume=0.0):
 
   def getSales(Pline, bulk=False):
     if Pline == 'All':
@@ -693,10 +693,14 @@ def getSummary(file, user_defaults_df=None):
   setDefaulted()
 
   print('Calculating QTY values...')
-  output.loc[output['Metric'] == 'QTY Gross', 'All Lines Cumulative'] = util.getSumGivenColumn('All', DATA_V2, 'L12 Shipped')
-  output.loc[output['Metric'] == 'QTY Gross', 'All Lines Bulk By Cumulative'] = util.getSumGivenColumn('All', DATA_V2, 'L12 Shipped')
+  gross = util.getSumGivenColumn('All', DATA_V2, 'L12 Shipped')
+  gross_all_lines = util.getSumGivenColumn('All', DATA_V2, 'L12 Shipped')
+  print(gross, gross + (gross * volume/100))
+  output.loc[output['Metric'] == 'QTY Gross', 'All Lines Cumulative'] = gross + (gross * volume/100)
+  output.loc[output['Metric'] == 'QTY Gross', 'All Lines Bulk By Cumulative'] = gross_all_lines + (gross_all_lines * volume/100)
   for line in Pline:
-    output.loc[output['Metric'] == 'QTY Gross', f'{line} Cumulative'] = util.getSumGivenColumn(line, DATA_V2, 'L12 Shipped')
+    gross_pline = util.getSumGivenColumn(line, DATA_V2, 'L12 Shipped')
+    output.loc[output['Metric'] == 'QTY Gross', f'{line} Cumulative'] = gross_pline + (gross_pline * volume/100)
   output = util.getQTYTotalAndDefect(output)
 
   print('Calculating Sales values...')
