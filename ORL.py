@@ -220,8 +220,12 @@ def getSummary(file, user_defaults_df=None, volume=0.0):
   output.loc[output['Metric'] == 'QTY Total', 'GTN/CGT Blended Cumulative'] = getQTYTotal('GTN/CGT Blended Cumulative')
 
   print('Calculating Sales...')
-  output.loc[output['Metric'] == 'Sales', 'GTN/CGT Current Cumulative'] = util.getSumGivenColumn('All', DATA, 'Total Sales (Currrent)')
-  output.loc[output['Metric'] == 'Sales', 'GTN/CGT Blended Cumulative'] = util.getSumGivenColumn('All', DATA, 'Total Sales (Adjusted) ')
+  current_sales = util.getSumGivenColumn('All', DATA, 'Total Sales (Currrent)')
+  current_sales = current_sales + (current_sales * volume/100)
+  adjusted_sales = util.getSumGivenColumn('All', DATA, 'Total Sales (Adjusted) ')
+  adjusted_sales = adjusted_sales + (adjusted_sales * volume/100)
+  output.loc[output['Metric'] == 'Sales', 'GTN/CGT Current Cumulative'] = current_sales
+  output.loc[output['Metric'] == 'Sales', 'GTN/CGT Blended Cumulative'] = adjusted_sales
   output.loc[output['Metric'] == 'Sales', 'GTN/CGT Current Per Unit'] = getPerUnit('Sales', 'GTN/CGT Current Cumulative')
   output.loc[output['Metric'] == 'Sales', 'GTN/CGT Blended Per Unit'] = getPerUnit('Sales', 'GTN/CGT Blended Cumulative')
 

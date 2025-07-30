@@ -194,7 +194,9 @@ def getSummary(file, user_defaults_df=None, volume=0.0):
   Defect_Per_Line = 'Defect Plines'
 
   print('Calculating data for Net Sales for all lines...')
-  output.loc[output['Metric'] == 'Sales', 'All Lines Cumulative'] = util.getSumGivenColumn('All', DATA, Sales_column)
+  sales = util.getSumGivenColumn('All', DATA, Sales_column)
+  sales = sales + (sales * volume)
+  output.loc[output['Metric'] == 'Sales', 'All Lines Cumulative'] = sales
   output.loc[output['Metric'] == 'Rebate', 'All Lines Cumulative'] = util.getSumGivenColumn('All', DATA, Rebate_column)*-1
   output.loc[output['Metric'] == 'Logistic Rebate N/A', 'All Lines Cumulative'] = util.getSumGivenColumn('All', DATA, Logistic_Rebate_column)
   output.loc[output['Metric'] == 'Agency Rep (N.A. Williams)', 'All Lines Cumulative'] = util.getSumGivenColumn('All', DATA, Agency_Rep_column)
@@ -213,7 +215,9 @@ def getSummary(file, user_defaults_df=None, volume=0.0):
 
   print('Calculating data for Net Sales for each Pline...')
   for line in Plines:
-    output.loc[output['Metric'] == 'Sales', f'{line} Cumulative'] = util.getSumGivenColumn(line, DATA, Sales_column)
+    sales = util.getSumGivenColumn(line, DATA, Sales_column)
+    sales = sales + (sales * volume/100)
+    output.loc[output['Metric'] == 'Sales', f'{line} Cumulative'] = sales
     output.loc[output['Metric'] == 'Rebate', f'{line} Cumulative'] = util.getSumGivenColumn(line, DATA, Rebate_column)*-1
     output.loc[output['Metric'] == 'Logistic Rebate N/A', f'{line} Cumulative'] = util.getSumGivenColumn(line, DATA, Logistic_Rebate_column)
     output.loc[output['Metric'] == 'Agency Rep (N.A. Williams)', f'{line} Cumulative'] = util.getSumGivenColumn(line, DATA, Agency_Rep_column)

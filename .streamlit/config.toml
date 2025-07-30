@@ -12,7 +12,6 @@ toolbarMode = "minimal"
 showErrorDetails = false
 
 [server]
-headless = true
 fileWatcherType = "auto"
 runOnSave = true  
 

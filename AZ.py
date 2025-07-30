@@ -236,8 +236,12 @@ def getSummary(file, user_defaults_df=None, volume=0.0):
   output.loc[output['Metric'] == 'QTY Total', 'SU Cumulative'] = getQTYTotal('SU Cumulative')
 
   print('Calculation Sales...')
-  output.loc[output['Metric'] == 'Sales', 'FM Cumulative'] = util.getSumGivenColumn('FM', DATA, 'Total Sales')
-  output.loc[output['Metric'] == 'Sales', 'SU Cumulative'] = util.getSumGivenColumn('SU', DATA, 'Total Sales')
+  FM_sales = util.getSumGivenColumn('FM', DATA, 'Total Sales')
+  FM_sales = FM_sales + (FM_sales * volume/100)
+  SU_sales = util.getSumGivenColumn('SU', DATA, 'Total Sales')
+  SU_sales = SU_sales + (SU_sales * volume/100)
+  output.loc[output['Metric'] == 'Sales', 'FM Cumulative'] = FM_sales
+  output.loc[output['Metric'] == 'Sales', 'SU Cumulative'] = SU_sales
   output.loc[output['Metric'] == 'Sales', 'FM Per Unit'] = getPerUnit('Sales', 'FM Cumulative')
   output.loc[output['Metric'] == 'Sales', 'SU Per Unit'] = getPerUnit('Sales', 'SU Cumulative')
 

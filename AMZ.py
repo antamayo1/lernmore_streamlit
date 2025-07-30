@@ -7,13 +7,16 @@ def getSummary(file, user_defaults_df=None, volume=0.0):
     if Pline == 'All':
       if bulk:
         sales_total = DATA_V2['Sales (Modified)'].sum()
+        sales_total = sales_total+(sales_total*volume/100)
         column_name = 'All Lines Bulk By Cumulative'
       else:
         sales_total = DATA_V2['Total Sales'].sum()
+        sales_total = sales_total+(sales_total*volume/100)
         column_name = 'All Lines Cumulative'
     else:
       filtered_data = DATA_V2[DATA_V2['Pline'] == Pline]
       sales_total = filtered_data['Total Sales'].sum()
+      sales_total = sales_total+(sales_total*volume/100)
       column_name = f'{Pline} Cumulative'
     
     output.loc[output['Metric'] == 'Sales', column_name] = sales_total

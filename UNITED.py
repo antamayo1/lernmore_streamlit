@@ -12,7 +12,9 @@ def getSummary(file, user_defaults_df=None, volume=0.0):
 
   def getSales(DATA):
     values = DATA['Annual usage'] * DATA['NEW Invoice']
-    return values.sum()
+    total = values.sum()
+    total = total + (total * volume/100)
+    return total
 
   def getPerUnit(row, column):
     return output.loc[output['Metric'] == row, column].iloc[0] / output.loc[output['Metric'] == 'QTY Gross', column].iloc[0]

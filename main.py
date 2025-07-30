@@ -609,7 +609,7 @@ if check_password():
             elif 'alliance' in name.lower():
               value = f"% {value*100:.3f}"
             else:
-              value = f"$ {value}"
+              value = f"$ {value:.2f}"
           elif 'qty' in name.lower():
             value = f"{value}"
           else:
