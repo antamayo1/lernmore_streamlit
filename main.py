@@ -650,7 +650,7 @@ if check_password():
                   st.write("No assumptions found in the original file.")
                 else:
                   for x in st.session_state.input_assumptions_df:
-                    subcol1, subcol2 = st.columns(2)
+                    subcol1, subcol2 = st.columns([3, 1])
                     with subcol1:
                       st.write(f"{x}:\n" + formatter(x, st.session_state.input_assumptions_df[x]))
                     with subcol2:
@@ -662,7 +662,7 @@ if check_password():
                   st.write("No defaults found in the original file.")
                 else:
                   for x in st.session_state.input_defaults_df:
-                    subcol1, subcol2 = st.columns(2)
+                    subcol1, subcol2 = st.columns([3, 1])
                     with subcol1:
                       st.write(f"{x}:\n" + formatter(x, st.session_state.input_defaults_df[x], True))
                     with subcol2:
@@ -813,6 +813,7 @@ if check_password():
 
                         ANALYSIS REQUIREMENTS:
                         1. **Executive Summary** (100 words max): Provide an overall assessment of how the parameter changes affected the business case, highlighting the most significant impacts and whether the changes improved or worsened the financial outlook.
+                          - Focus on the last row, the contribution margin %, as the overall impact to the BCA. If its negative, the changes worsened the BCA, if positive, they improved it. Apply ** ** for the statement to be in bold format.
 
                         2. **Detailed Impact Analysis** (5-7 bullet points):
                           - For each significant parameter change, explain its business impact
@@ -829,7 +830,8 @@ if check_password():
                         - Clearly distinguish between different products when multiple exist
                         - Focus on business implications, not just numerical changes
                         - Identify the most critical metrics for decision-making
-                        - Use positive/negative language appropriately'''
+                        - Use positive/negative language appropriately
+                        '''
                       }
                     ],
                     max_tokens=3500,
